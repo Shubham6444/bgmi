@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BGMI Tournament Admin Panel</title>
+   
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light gray text */
+        }
+
+        .container {
+        
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        section {
+            background-color: #1e1e1e; /* Dark gray cards */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        table {
+          
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            background-color: #292929; /* Darker header */
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #252525;
+        }
+
+        tr:hover {
+            background-color: #333; /* Highlight row on hover */
+        }
+
+        .filter {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filter label {
+            margin-right: 10px;
+        }
+
+        .filter select, .filter input {
+            padding: 8px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #f39c12; /* Orange accent */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #e67e22;
+        }
+
+        /* Modal styles */
+        #update-user-modal {
+            display: none; 
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media screen and (max-width: 768px) {
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .filter {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter select, .filter input {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BGMI Tournament Admin Panel</h1>
+        
+        <section id="user-list">
+            <h2>All Users</h2>
+            <div class="filter">
+                <label for="user-filter">Filter:</label>
+                <select id="user-filter">
+                    <option value="all">All</option>
+                    <option value="name">Name</option>
+                    <option value="email">Email</option>
+                    <option value="upi">UPI ID</option>
+                </select>
+                <input type="text" id="user-search" placeholder="Search...">
+                <button onclick="loaddata()">Refresh</button>
+            </div>
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>UPI ID</th>
+                        <th>Added Money</th>
+                        <th>Win Money</th>
+                        <th>BGMI ID</th>
+                        <th>freefire Id ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <!-- Update User Modal -->
+        <div id="update-user-modal">
+            <div class="modal-content">
+                <h3>Update User</h3>
+                <form id="update-user-form">
+                    <input type="hidden" id="update-user-id">
+                    <input type="text" id="update-user-name" placeholder="Name" required>
+                    <input type="email" id="update-user-email" placeholder="Email" required>
+                    <input type="text" id="update-user-upiid" placeholder="UPI ID" required>
+                    <input type="number" id="update-user-addamount" placeholder="Added Money" required>
+                    <input type="number" id="update-user-winamount" placeholder="Win Money" required>
+                    <input type="text" id="update-user-bgmi_id" placeholder="BGMI ID" required>
+                    <button type="submit">Update User</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+   document.addEventListener("DOMContentLoaded", () => {
+
+  // Existing JavaScript code
+  async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+
+                 
+            fetchData();
+            setupFilters(); // Initialize filtering for all tables
+      
+
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               // window.location.href = '/login.html';
+            }
+        }verifySession();
+
+    });
+
+
+
+        function setupFilters() {
+            document.querySelectorAll(".filter input, .filter select").forEach((filterElement) => {
+                filterElement.addEventListener("input", applyFilters);
+                filterElement.addEventListener("change", applyFilters);
+            });
+        }
+
+        function applyFilters() {
+            const userFilterType = document.querySelector("#user-filter").value;
+            const userSearchTerm = document.querySelector("#user-search").value.toLowerCase();
+
+            fetch("/auth/user-data")
+                .then((response) => response.json())
+                .then((data) => {
+                    // Apply filtering for each table
+                    filterAndRenderUsers(data.users, userFilterType, userSearchTerm);
+                })
+                .catch((error) => console.error("Error fetching data:", error));
+        }
+
+        function filterAndRenderUsers(users, filterType, searchTerm) {
+            let filteredUsers = users.filter((user) => {
+                if (!searchTerm) return true;
+                if (filterType === "name") return user.name.toLowerCase().includes(searchTerm);
+                if (filterType === "email") return user.email.toLowerCase().includes(searchTerm);
+                if (filterType === "upi") return user.upiid.toLowerCase().includes(searchTerm);
+                return true;
+            });
+            populateUsersTable(filteredUsers);
+        }
+
+        function fetchData() {
+            fetch('/auth/user-data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateUsersTable(data.users);
+                    console.log(data.users)
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+function loaddata(){
+    fetchData()
+  
+}
+        function populateUsersTable(users) {
+            const tbody = document.querySelector("#users-table tbody");
+            tbody.innerHTML = ""; 
+
+            users.forEach(user => {
+                const row = `<tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                   
+                    <td>${user.upiid}</td>
+                    <td>₹${user.addamount}</td>
+                    <td>₹${user.winamount}</td>
+                    <td>${user.bgmi_id}</td>
+                    <td>${user.freefir_id}</td>
+                    <td>
+                        <button onclick="showUpdateUserModal(${user.id}, '${user.name}', '${user.email}', '${user.upiid}', ${user.addamount}, ${user.winamount}, '${user.bgmi_id}')">Update</button>
+                        <button onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function showUpdateUserModal(userId, name, email, upiid, addamount, winamount, bgmi_id) {
+            document.getElementById('update-user-id').value = userId;
+            document.getElementById('update-user-name').value = name;
+            document.getElementById('update-user-email').value = email;
+            document.getElementById('update-user-upiid').value = upiid;
+            document.getElementById('update-user-addamount').value = addamount;
+            document.getElementById('update-user-winamount').value = winamount;
+            document.getElementById('update-user-bgmi_id').value = bgmi_id;
+
+            document.getElementById('update-user-modal').style.display = "flex"; // Show modal
+        }
+
+        function closeModal() {
+            document.getElementById('update-user-modal').style.display = "none"; // Hide modal
+        }
+
+        document.getElementById("update-user-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const userId = document.getElementById('update-user-id').value;
+            const name = document.getElementById('update-user-name').value;
+            const email = document.getElementById('update-user-email').value;
+            const upiid = document.getElementById('update-user-upiid').value;
+            const addamount = document.getElementById('update-user-addamount').value;
+            const winamount = document.getElementById('update-user-winamount').value;
+            const bgmi_id = document.getElementById('update-user-bgmi_id').value;
+
+            fetch(`/auth/updateuser`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId, name, email, upiid, addamount, winamount, bgmi_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('User updated successfully!');
+                closeModal();
+                fetchData(); // Refresh the user list
+            })
+            .catch(error => {
+                console.error('Error updating user:', error);
+            });
+        });
+
+        function deleteUser(userId) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                fetch(`/auth/deleteUser`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('User deleted successfully!');
+                    fetchData(); // Refresh the user list
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                });
+            }
+        }
+   
+
+
+
+
+
+      </script>
+</body>
+</html>

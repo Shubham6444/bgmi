@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tournament</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #ff9800;
+        }
+
+        label {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #ff5722, #ff9800);
+        }
+
+        .response-message {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+            }
+
+            label {
+                font-size: 12px;
+            }
+
+            input, select, button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Create Tournament</h1>
+        
+        <!-- Tournament Creation Form -->
+        <form id="createTournamentForm">
+            <label for="battleId">Battle ID:</label>
+            <input type="text" id="battleId" name="battleId" required>
+
+            <label for="heading">Tournament Heading:</label>
+            <input type="text" id="heading" name="heading" required>
+
+            <label for="time">Tournament Time:</label>
+            <input type="datetime-local" value="2025-02-18 18:00" id="time" name="time" placeholder="e.g. 2025-02-18 18:00" required>
+
+            <label for="currentParticipants">Current Participants:</label>
+            <input type="number" id="currentParticipants" name="currentParticipants" required>
+
+            <label for="joinFee">Join Fee (₹):</label>
+            <input type="number" id="joinFee" name="joinFee" required>
+
+            <button type="submit">Create Tournament</button>
+        </form>
+
+        <!-- Response Message -->
+        <div id="responseMessage" class="response-message"></div>
+    </div>
+
+    <script>
+
+
+document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                  // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });
+
+
+
+
+
+
+        document.getElementById("createTournamentForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const battleId = document.getElementById("battleId").value;
+            const heading = document.getElementById("heading").value;
+            const time = document.getElementById("time").value;
+            const currentParticipants = document.getElementById("currentParticipants").value;
+            const joinFee = document.getElementById("joinFee").value;
+
+            const responseMessage = document.getElementById("responseMessage");
+
+            // Clear previous response
+            responseMessage.innerHTML = "";
+
+            try {
+                const response = await fetch('/auth/Create_tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        battleId,
+                        heading,
+                        time,
+                        currentParticipants,
+                        joinFee,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    responseMessage.innerHTML = `<p class="success">${result.message}</p>`;
+                    document.getElementById("createTournamentForm").reset(); // Reset form
+                } else {
+                    responseMessage.innerHTML = `<p class="error">${result.message}</p>`;
+                }
+            } catch (error) {
+                console.error("Error creating tournament:", error);
+                responseMessage.innerHTML = "<p class='error'>Failed to create tournament. Please try again.</p>";
+            }
+        });
+    </script>
+
+</body>
+</html>

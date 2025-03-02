@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBG Tournament</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/bot.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f08f40;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+           
+        }
+
+        .top-bar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items:center;
+            background: #1e1e1e;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+        }
+
+        .user-info {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            color: #ff9800;
+            font-weight: bold;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .wallet {
+            background: #ff9800;
+            color: #121212;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+            padding-top: 10px;
+
+        }
+
+        .battle-list {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+
+        .container {
+            width: 100vh;
+            max-width: 500px;
+            padding: 20px;
+            background: #777777;
+            
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .tournament-image {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        input[type="range"] {
+            width: 60%;
+           
+        }
+
+        button {
+            width: 100%;
+            margin: 4px;
+            padding: 12px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #ff5722, #ff9800);
+        }
+
+        .loader {
+      border: 3px solid #00ff00;
+      border-top: 3px solid #f8a306;
+      border-bottom: 3px solid #fd0505;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 0.5s linear infinite;
+      margin: 5px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 40vh;
+            }
+
+            .battle-list {
+                width: 100%;
+            }
+
+            .top-bar {
+                justify-content: center;
+               
+                padding: 0;
+                border-radius: 0;
+                margin: 0;
+                font-size: 15px;
+                height: 65px;
+            }
+
+
+        }
+/* Popup styling */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7); /* Dark transparent overlay */
+    
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Popup container */
+.popup-container {
+  
+    background: #222;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Heading */
+.popup-container h2 {
+    color: #ff5722;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+/* Wallet link */
+.wallet-link {
+    color: #ff5722;
+    font-size: 18px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Wallet icon and text */
+.wallet {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.wallet svg {
+    margin-right: 8px;
+}
+
+/* Popup info */
+.popup-info {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: left;
+    color: #000000;
+}
+
+.popup-info p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+/* Buttons */
+.popup-container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-container button:first-of-type {
+    background: #ff5722;
+    color: white;
+}
+
+.popup-container .cancel-btn {
+    background: #000000;
+    color: white;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+        .bottom-nav {
+            z-index: 1000;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ff5c00;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 2px solid white;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+
+
+
+
+        .running-border {
+           margin-top: 12px;
+            box-shadow:2px 2px 8px 2px ;
+            font-size: 15px;
+            font-weight: bold;
+            color: rgb(134, 238, 148);
+            position: relative;
+            border: 3px solid transparent;
+            border-radius:8px;
+        }
+
+        .running-border::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgb(6, 243, 25); /* Change color as needed */
+            border-right: 3px solid rgb(248, 141, 0); /* Change color as needed */
+            border-left: 3px solid rgb(253, 135, 0); /* Change color as needed */
+            border-radius: 10px;
+            box-sizing: border-box;
+            clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%);
+            animation: borderRun 2s linear infinite;
+          
+           
+        }
+
+        @keyframes borderRun {
+            0%   { clip-path: polygon(0% 100%, 0% 0%, 0% 0%, 0% 0%); }  /* Left */
+            25%  { clip-path: polygon(0% 100%, 0% 0%, 100% 0%, 100% 0%); } /* Top */
+            50%  { clip-path: polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%); } /* Right */
+            75%  { clip-path: polygon(0% 100%, 0% 100%, 100% 100%, 100% 100%); } /* Bottom */
+            100% { clip-path: polygon(0% 100%, 0% 0%, 0% 0%, 0% 0%); } /* Back to Left */
+        }
+
+        
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="bottom-nav">
+        <a style="color: rgb(0, 0, 0);"  href="/" class="nav-item">
+            <i class="fas fa-home"></i>
+            <div>Home</div>
+        </a>
+
+        <a href="mybttles.html"  class="nav-item">
+            <i class="fab fa-fly"></i>
+            <div>Joined</div>
+        </a>
+        <a href="/wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <div>Wallet</div>
+        </a>
+        <a href="support.html" class="nav-item">
+            <i class="fab fa-weixin"></i>
+            <div>support</div>
+        </a>
+    </nav>
+
+    <!-- Top bar with User ID & Wallet -->
+    <div class="top-bar">
+        <div class="user-info">
+            <div>User ID:
+                <a style="color: #ff5722;" href="/profile.html"> <span id="userId">Loading...</span></a>
+                <span id="bgmiid" hidden>Loading...</span>
+                <span id="freefireid" hidden>Loading...</span>
+            </div>
+
+            <div style="display: flex;">
+            <div>
+                <a style="color: #ff5722;font-size: 20px;" href="wallet.html"> <span class="wallet"><svg
+                            fill="#e15c14" height="20px" width="20px" version="1.1" id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 512 512" xml:space="preserve" stroke="#e15c14">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,278.261c-27.664,0-50.087,22.423-50.087,50.087s22.423,50.087,50.087,50.087H512V278.261H361.739z M361.739,345.043c-9.22,0-16.696-7.475-16.696-16.696s7.475-16.696,16.696-16.696s16.696,7.475,16.696,16.696 S370.96,345.043,361.739,345.043z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,244.87h83.478v-50.087c0-27.619-22.468-50.087-50.087-50.087H16.696C7.479,144.696,0,152.174,0,161.391v333.913 C0,504.521,7.479,512,16.696,512H395.13c27.619,0,50.087-22.468,50.087-50.087v-50.087h-83.478 c-46.032,0-83.478-37.446-83.478-83.478C278.261,282.316,315.707,244.87,361.739,244.87z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M461.913,144.696h-0.158c10.529,13.973,16.854,31.282,16.854,50.087v50.087H512v-50.087 C512,167.164,489.532,144.696,461.913,144.696z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M478.609,411.826v50.087c0,18.805-6.323,36.114-16.854,50.087h0.158C489.532,512,512,489.532,512,461.913v-50.087H478.609 z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M273.369,4.892c-6.521-6.521-17.087-6.521-23.609,0l-14.674,14.674l91.74,91.738h52.956L273.369,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M173.195,4.892c-6.521-6.522-17.086-6.522-23.608,0L43.174,111.304h236.435L173.195,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        ₹<span id="addedWallet2"><div id="loaderb1" style="width: 10px;height: 10px;margin: 0;padding: 0;border: 4px solid radial-gradient(circle, rgba(63,94,251,1) 0%, rgb(108, 247, 27) 100%);" class="loader"></div></span></span></a>
+
+            </div>
+            <div>
+                <a style="color: #ff5722;font-size: 20px;" href="wallet.html"> <span class="wallet"><svg
+                            fill="#e15c14" height="20px" width="20px" version="1.1" id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 512 512" xml:space="preserve" stroke="#e15c14">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,278.261c-27.664,0-50.087,22.423-50.087,50.087s22.423,50.087,50.087,50.087H512V278.261H361.739z M361.739,345.043c-9.22,0-16.696-7.475-16.696-16.696s7.475-16.696,16.696-16.696s16.696,7.475,16.696,16.696 S370.96,345.043,361.739,345.043z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,244.87h83.478v-50.087c0-27.619-22.468-50.087-50.087-50.087H16.696C7.479,144.696,0,152.174,0,161.391v333.913 C0,504.521,7.479,512,16.696,512H395.13c27.619,0,50.087-22.468,50.087-50.087v-50.087h-83.478 c-46.032,0-83.478-37.446-83.478-83.478C278.261,282.316,315.707,244.87,361.739,244.87z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M461.913,144.696h-0.158c10.529,13.973,16.854,31.282,16.854,50.087v50.087H512v-50.087 C512,167.164,489.532,144.696,461.913,144.696z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M478.609,411.826v50.087c0,18.805-6.323,36.114-16.854,50.087h0.158C489.532,512,512,489.532,512,461.913v-50.087H478.609 z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M273.369,4.892c-6.521-6.521-17.087-6.521-23.609,0l-14.674,14.674l91.74,91.738h52.956L273.369,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M173.195,4.892c-6.521-6.522-17.086-6.522-23.608,0L43.174,111.304h236.435L173.195,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        ₹<span id="winWallet"> <div id="loaderb2" style="width: 10px;height: 10px;margin: 0;padding: 0;border: 4px solid radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);" class="loader"></div></span></span></a>
+
+            </div>
+                </div>
+
+        </div>
+    </div>
+    <h2 style="color: black;"> 🔹 Available Battles</h2>
+
+    <!-- Loader -->
+    <div id="loader" class="loader" ></div>
+
+    <div id="battleList"></div>
+
+
+
+
+
+    
+<!-- Add Money Popup -->
+<div id="joinPop" class="popup">
+    <div class="popup-container">
+        <h2>Join Tournament</h2>
+
+        <a href="#" class="wallet-link">
+            <span class="wallet">
+                <svg
+                            fill="#e15c14" height="20px" width="20px" version="1.1" id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 512 512" xml:space="preserve" stroke="#e15c14">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,278.261c-27.664,0-50.087,22.423-50.087,50.087s22.423,50.087,50.087,50.087H512V278.261H361.739z M361.739,345.043c-9.22,0-16.696-7.475-16.696-16.696s7.475-16.696,16.696-16.696s16.696,7.475,16.696,16.696 S370.96,345.043,361.739,345.043z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,244.87h83.478v-50.087c0-27.619-22.468-50.087-50.087-50.087H16.696C7.479,144.696,0,152.174,0,161.391v333.913 C0,504.521,7.479,512,16.696,512H395.13c27.619,0,50.087-22.468,50.087-50.087v-50.087h-83.478 c-46.032,0-83.478-37.446-83.478-83.478C278.261,282.316,315.707,244.87,361.739,244.87z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M461.913,144.696h-0.158c10.529,13.973,16.854,31.282,16.854,50.087v50.087H512v-50.087 C512,167.164,489.532,144.696,461.913,144.696z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M478.609,411.826v50.087c0,18.805-6.323,36.114-16.854,50.087h0.158C489.532,512,512,489.532,512,461.913v-50.087H478.609 z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M273.369,4.892c-6.521-6.521-17.087-6.521-23.609,0l-14.674,14.674l91.74,91.738h52.956L273.369,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M173.195,4.892c-6.521-6.522-17.086-6.522-23.608,0L43.174,111.304h236.435L173.195,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+              ₹<span id="addedWallet">00</span>
+            </span>
+            <span class="wallet">
+                <svg
+                            fill="#e15c14" height="20px" width="20px" version="1.1" id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 512 512" xml:space="preserve" stroke="#e15c14">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,278.261c-27.664,0-50.087,22.423-50.087,50.087s22.423,50.087,50.087,50.087H512V278.261H361.739z M361.739,345.043c-9.22,0-16.696-7.475-16.696-16.696s7.475-16.696,16.696-16.696s16.696,7.475,16.696,16.696 S370.96,345.043,361.739,345.043z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M361.739,244.87h83.478v-50.087c0-27.619-22.468-50.087-50.087-50.087H16.696C7.479,144.696,0,152.174,0,161.391v333.913 C0,504.521,7.479,512,16.696,512H395.13c27.619,0,50.087-22.468,50.087-50.087v-50.087h-83.478 c-46.032,0-83.478-37.446-83.478-83.478C278.261,282.316,315.707,244.87,361.739,244.87z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M461.913,144.696h-0.158c10.529,13.973,16.854,31.282,16.854,50.087v50.087H512v-50.087 C512,167.164,489.532,144.696,461.913,144.696z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M478.609,411.826v50.087c0,18.805-6.323,36.114-16.854,50.087h0.158C489.532,512,512,489.532,512,461.913v-50.087H478.609 z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M273.369,4.892c-6.521-6.521-17.087-6.521-23.609,0l-14.674,14.674l91.74,91.738h52.956L273.369,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                                <g>
+                                    <g>
+                                        <path
+                                            d="M173.195,4.892c-6.521-6.522-17.086-6.522-23.608,0L43.174,111.304h236.435L173.195,4.892z">
+                                        </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+              ₹<span id="winWallet3">00</span>
+            </span>
+      </a>
+       
+       
+        <div class="popup-info">
+            <p><strong><span id="payfee"></span></strong> </p>
+            <p><strong><span id="perkill"></span></strong> </p>
+            <p><strong>Game Mode:</strong> Battle Royale</p>
+        </div>
+      
+        <div id="pay"></div>
+       
+        <button onclick="closePopup()" class="cancel-btn">Cancel</button>
+    </div>
+</div>
+
+
+
+
+    <br><br><br>
+    <script>
+        // Open & Close Popups
+        function JoinPopup(battleid, fee) {
+              
+            let payfee = document.getElementById('payfee');
+            let perkill = document.getElementById('perkill');
+            pay.innerHTML = ''; // Clear previous content
+            payfee.innerHTML = ''; // Clear previous content
+            perkill.innerHTML = '';
+
+            // Create the button element
+            let button = document.createElement('button');
+            let p = document.createElement('p');
+           
+            let p2 = document.createElement('p');
+          
+            button.textContent = 'Confirm & Join';
+            p.textContent = `Entry Fee: ₹${fee}`;
+            p2.textContent = `Per Kill: ₹${fee/2}`;
+            let bgmiid= document.getElementById('bgmiid').innerHTML;
+            let freefireid=  document.getElementById('freefireid').innerHTML;
+            // Set up the onclick event for the button
+            button.onclick = function () {
+                
+                joinBattle(bgmiid,freefireid,battleid, fee);
+
+            };
+
+            // Append the button to the 'pay' element
+            pay.appendChild(button);
+            payfee.appendChild(p);
+            perkill.appendChild(p2);
+
+            // Show the popup by adding an 'active' class
+            document.getElementById("joinPop").style.display='flex';
+        }
+
+        function closePopup() {
+            document.getElementById("joinPop").classList.remove("active");
+            document.getElementById("joinPop").style.display='none';
+
+        }
+
+     
+            const loader = document.getElementById("loader");
+            const loaderb2 = document.getElementById("loaderb2");
+            const loaderb1 = document.getElementById("loaderb1");
+            const winWallet3 = document.getElementById("winWallet3");
+            const battleList = document.getElementById("battleList");
+
+
+
+            // Fetch Wallet Data
+            async function fetchWalletData() {
+                let addedWallet = document.getElementById('addedWallet');
+                let addedWallet2 = document.getElementById('addedWallet2');
+                let winWallet = document.getElementById('winWallet');
+                let winWallet3 = document.getElementById('winWallet3');
+                let userId = document.getElementById('userId');
+                let bgmiid = document.getElementById('bgmiid');
+                let freefireid = document.getElementById('freefireid');
+                // let upiDisplay = document.getElementById('upiDisplay');
+                // let bgmiDisplay = document.getElementById('bgmiDisplay');
+
+                try {
+                    const response = await fetch('/auth/userwallet', { method: 'GET', credentials: 'include' });
+                    const data = await response.json();
+
+                    addedWallet.innerHTML = data.wallet.addamount;
+                    addedWallet2.innerHTML = data.wallet.addamount;
+                    winWallet.innerHTML = data.wallet.winamount;
+                    winWallet3.innerHTML = data.wallet.winamount;
+                    userId.innerHTML = data.wallet.email;
+                    bgmiid.innerHTML = data.wallet.bgmi_id;
+                    freefireid.innerHTML = data.wallet.freefir_id;
+                    // upiDisplay.innerHTML = data.wallet.upiid;
+                    // bgmiDisplay.innerHTML = data.wallet.bgmi_id;
+
+
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+            fetchWalletData();
+
+
+
+// Fetch all battles
+async function fetchBattles() {
+    try {
+        loader.style.display = "block";
+        loaderb2.style.display = "block";
+        loaderb1.style.display = "block";
+        battleList.innerHTML = "";
+
+        const response = await fetch("/auth/tournaments");
+        const data = await response.json(); // Expecting { battles }
+
+        loader.style.display = "none";
+        loaderb2.style.display = "none";
+        loaderb1.style.display = "none";
+
+        displayBattles(data); // Pass battles array
+
+    } catch (error) {
+        console.error("Error fetching battles:", error);
+        loader.style.display = "none";
+        loaderb2.style.display = "none";
+        loaderb1.style.display = "none";
+        battleList.innerHTML = "<p style='text-align:center; color: red;'>❌ Failed to load battles.</p>";
+    }
+}
+
+function reload(){
+    fetchBattles();
+}
+
+// Display battles dynamically
+async function displayBattles(battles) {
+    battleList.innerHTML = "";
+
+    if (battles.length === 0) {
+        battleList.innerHTML = "<p style='text-align:center; color: white;'>No battles available.</p>";
+        return;
+    }
+
+    for (const battle of battles) {
+        const battleItem = document.createElement("div");
+        battleItem.classList.add("container");
+
+        // Check if the user already joined this battle
+        let userJoined = await checkingJoin(battle.battleId); // Wait for response
+        const roomIdDisplay = userJoined && battle.roomid ? battle.roomid : "To be announced before 15 min";
+        const passwordDisplay = userJoined && battle.password ? battle.password : "To be announced before 15 min";
+        const formattedTime = formatBattleTime(battle.time);
+        const now = new Date().getTime();
+        const battleStartTime = new Date(battle.time).getTime();
+        const timeLeft = battleStartTime - now;
+
+        const isJoinDisabled = timeLeft <= 15 * 60 * 1000; // True if less than 15 min left
+        battleItem.innerHTML = `          
+             <div style='display:flex;justify-content:space-around;background:b0a9a9; box-shadow:-2px 2px 8px 2px ; padding-top:14px;border-radius:8px;'>                   
+  ${battle.battleId.charAt(0).toLowerCase() === 'b' ? 
+    '<img src="images/game-img-3.png" style="width: 100px;" alt="PUBG Tournament Banner" class="tournament-image">' :
+    ''}
+  ${battle.battleId.charAt(0).toLowerCase() === 'f' ? 
+    '<img src="homeimg/freefire.png" style="width: 100px;" alt="Free Fire Tournament Banner" class="tournament-image">' :
+    ''}
+
+
+<div>
+    <h1>${battle.heading}</h1>
+  <p>Battle ID: ${battle.battleId}</p>
+</div>
+</div>
+
+
+
+
+
+<br>
+
+    <div class="tournament-info" style='box-shadow:2px 2px 8px 4px ;padding:10px;margin-bottom:16px;border-radius:8px;'>
+    <div class="tournament-info" style='padding:10px;margin-bottom:16px;'>
+                    <p><strong>Time:</strong> ${formattedTime}</p>
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 400px; margin: 10px auto;">
+    <p style="font-weight: bold;">Max Participants:</p>
+    <p style="font-weight: bold;">Current Participants:</p>
+</div>
+
+  <div style="display: flex;justify-content:center; align-items: center; gap: 10px;">
+            <p style="margin: 0; font-weight: bold;">${battle.maxParticipants || 100}</p>
+           
+           <div style='position:relative;top:6px'> <input class="progress-bar" type="range" min="0" max="${battle.maxParticipants}" value="${battle.currentParticipants}" disabled 
+                style="width: 100%; height: 8px; border-radius: 5px; background: linear-gradient(to right, #4caf50 0%, #ff9800 100%); accent-color: #4caf50;">
+</div>
+            <p style="margin: 0; font-weight: bold;">${battle.currentParticipants}</p>
+        </div>
+    </div>
+
+            <div style='box-shadow:2px 2px 8px 2px ;display:flex;justify-content:space-around;border-radius:8px;'><p><strong>Join Fee:</strong> ₹${battle.joinfee}</p>
+        <p><strong>Per Kill:</strong> ₹${battle.joinfee / 2}</p></div>
+           ${userJoined 
+                ? `<p style="position: fixed; left: 10%;top: 10%;" onClick='reload()'><svg fill="#ffffff" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 383.748 383.748" xml:space="preserve" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M62.772,95.042C90.904,54.899,137.496,30,187.343,30c83.743,0,151.874,68.13,151.874,151.874h30 C369.217,81.588,287.629,0,187.343,0c-35.038,0-69.061,9.989-98.391,28.888C70.368,40.862,54.245,56.032,41.221,73.593 L2.081,34.641v113.365h113.91L62.772,95.042z"></path> <path d="M381.667,235.742h-113.91l53.219,52.965c-28.132,40.142-74.724,65.042-124.571,65.042 c-83.744,0-151.874-68.13-151.874-151.874h-30c0,100.286,81.588,181.874,181.874,181.874c35.038,0,69.062-9.989,98.391-28.888 c18.584-11.975,34.707-27.145,47.731-44.706l39.139,38.952V235.742z"></path> </g> </g></svg></p>
+                <div class="running-border"><p><strong>Room ID:</strong> ${roomIdDisplay}</p>
+                   <p><strong>Password:</strong> ${passwordDisplay}</p></div>` 
+                : ''}  <!-- Show only if userJoined is true -->
+</div>
+ <p id="countdown-${battle.battleId}" style="color:red; font-weight:bold;"></p> <!-- Countdown Timer Here -->
+        <div style='display:flex'> 
+                    ${battle.currentParticipants >= (battle.maxParticipants || 100) 
+                        ? `<button disabled style="background:red;">Battle Full</button>` 
+                        : userJoined 
+                            ? `<button disabled style="background:gray;">Joined</button>` 
+                            : isJoinDisabled
+                                ? `<button disabled style="background:orange;">Joining Closed</button>`
+                                : `<button onclick="JoinPopup('${battle.battleId}', '${battle.joinfee}')">Join Tournament</button>`}
+                    <button onclick="openBattleChart('${battle.battleId}')">View Chart</button>
+        </div>
+    </div>
+`;
+
+        battleList.appendChild(battleItem);
+        startCountdown(battle.time, battle.battleId);
+    }
+}
+// Format the battle time into a readable format
+function formatBattleTime(time) {
+    const date = new Date(time);
+    return date.toLocaleString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        hour12: true, 
+        weekday: 'short', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+}
+// Start countdown timer if battle starts in 15 minutes
+function startCountdown(battleTime, battleId) {
+    const battleStartTime = new Date(battleTime).getTime();
+    const countdownElement = document.getElementById(`countdown-${battleId}`);
+
+    if (!countdownElement) return; // Exit if element is not found
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const timeLeft = battleStartTime - now;
+        const minutesLeft = Math.floor(timeLeft / (1000 * 60));
+        const secondsLeft = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        if (timeLeft > 15 * 60 * 1000) {
+            countdownElement.innerHTML = "Battle starts in more than 15 minutes";
+        } else if (timeLeft > 0) {
+            countdownElement.innerHTML = `Battle starts in ${minutesLeft}m ${secondsLeft}s`;
+        } else {
+            countdownElement.innerHTML = "<span style='color: green;'>Battle Started!</span>";
+            clearInterval(interval);
+        }
+    }
+
+    // Declare interval properly to avoid reference errors
+    let interval = setInterval(updateCountdown, 1000);
+    updateCountdown(); // Run immediately to prevent delay
+}
+
+
+
+
+// Check if the user has already joined a battle
+async function checkingJoin(battleId) {
+    try {
+        const response = await fetch('/auth/checkingJoin', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ battleId }),
+        });
+
+        if (!response.ok) {
+            return false; // User has NOT joined
+        } else {
+            const result = await response.json();
+            return result.success === false ? true : false; // If success=false, user has joined
+        }
+    } catch (error) {
+        console.error('Error verifying session:', error);
+        //window.location.href = '/login.html';
+        return false;
+    }
+}
+
+// Call fetchBattles on page load
+fetchBattles();
+
+
+
+
+       
+
+        // Move these functions outside the event listener so they are globally accessible
+        function openBattleChart(battleId) {
+            window.location.href = `battalcart.html?battleId=${battleId}`;
+        }
+
+
+        async function joinBattle(bgmiid,freefireid,battleId, fee) {
+            let loader = document.getElementById('loader');
+loader.style.display = 'block';
+loader.style.position = 'fixed';
+loader.style.left = '50%';
+loader.style.top = '40%';
+loader.style.transform = 'translate(-50%, -50%)';
+loader.style.zIndex = '9999'; // Optional, to make sure it appears on top of other elements
+
+             
+            try {
+                const response = await fetch("/auth/joinenow", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({bgmiid,freefireid, battleId: battleId, fee: fee }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Successfully joined the battle!");
+                    closePopup();
+                    fetchWalletData();
+                    fetchBattles();
+                    document.getElementById('loader').style.display='none';
+                   
+                } else {
+                    alert(result.message); // Show error message if already joined
+                    closePopup();
+                    document.getElementById('loader').style.display='none';
+                }
+            } catch (error) {
+                console.error("Error joining battle:", error);
+                alert("Failed to join battle. Try again.");
+            }
+        }
+
+
+
+
+           // Existing JavaScript code
+                async function verifySession() {
+            try {
+                const response = await fetch('/session', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    const result = await response.json();
+                   // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('picture').src = result.user.picture;
+                  // console.log(result)
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+               return;
+                window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+
+
+    </script>    </script>
+
+</body>
+
+</html>

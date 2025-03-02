@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BGMI/Free Fire टूर्नामेंट | प्रति किल रिवॉर्ड</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <style>
+        :root {
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff00ff;
+    --dark-bg: #0a0a0a;
+    --card-bg: #151515;
+}
+
+body {
+    font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+    background-color: var(--dark-bg);
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    background: url('/homeimg/bgmi2.webp') center/cover;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+.neon-text {
+  
+   
+ 
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    font-weight: 600;   
+    position: relative;
+    overflow: hidden;
+   
+}
+
+@keyframes neonGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+.text-gradient {
+    background: rgb(255, 187, 0);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    font-weight: 600;   
+    position: relative;
+    overflow: hidden;
+}
+
+.glow-text {
+    color: #fff;
+    text-shadow: 0 0 5px var(--neon-blue);
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    font-weight: 600;   
+    position: relative;
+    overflow: hidden;
+}
+
+/* Buttons */
+.btn-neon {
+    background: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 12px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+    background: var(--neon-blue);
+    color: var(--dark-bg);
+    box-shadow: 0 0 20px var(--neon-blue);
+}
+
+/* Feature Cards */
+.feature-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-card i {
+    color: var(--neon-blue);
+}
+
+/* Prize Cards */
+.prize-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.prize-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prize-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    margin-bottom: 10px;
+}
+
+.prize-label {
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+/* Rules Section */
+.rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.rule-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* Footer */
+.footer {
+    background: var(--card-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .neon-text {
+        font-size: 2.5rem;
+    }
+    
+    .text-gradient {
+        
+        font-size: 1.8rem;
+    }
+    
+    .prize-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rules-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* Glowing Text Animation */
+@keyframes glow {
+    0% {
+        text-shadow: 0 0 10px var(--neon-blue);
+    }
+    50% {
+        text-shadow: 0 0 20px var(--neon-blue),
+                     0 0 30px var(--neon-blue);
+    }
+    100% {
+        text-shadow: 0 0 10px var(--neon-blue);
+    }
+}
+
+.glow-text {
+    animation: glow 2s infinite;
+}
+
+/* Prize Card Hover Effect */
+.prize-card {
+    transition: all 0.3s ease;
+}
+
+.prize-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+/* Button Hover Animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 243, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 243, 255, 0);
+    }
+}
+
+.btn-neon {
+    animation: pulse 2s infinite;
+}
+
+/* Feature Card Animation */
+@keyframes floatUp {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.feature-card {
+    animation: floatUp 3s ease-in-out infinite;
+}
+
+/* Section Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+section {
+    animation: fadeIn 1s ease-out;
+}
+
+/* Neon Border Animation */
+@keyframes borderGlow {
+    0% {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 10px var(--neon-blue);
+    }
+    50% {
+        border-color: var(--neon-pink);
+        box-shadow: 0 0 20px var(--neon-pink);
+    }
+    100% {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 10px var(--neon-blue);
+    }
+}
+
+.prize-card.winner {
+    animation: borderGlow 2s infinite;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="container">
+            <div class="row min-vh-100 align-items-center">
+                <div class="col-lg-8 text-center text-lg-start">
+                    <h1 class="neon-text mb-4">joinbattle.online</h1>
+                    <h2 class="text-gradient mb-4">BGMI & FREE FIRE</h2>
+                    <p class="lead glow-text">प्रति किल ₹50 का इनाम | कुल पूल प्राइज ₹50,000</p>
+                <a href="login.html"> <button class="btn btn-neon btn-lg mt-4">अभी Login करें</button></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournament Details -->
+    <section class="tournament-details py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">टूर्नामेंट विवरण</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                        <h3>तिथि और समय</h3>
+                        <p>25 Feb, 2025<br>Night 8:00 बजे</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <h3>टीम साइज</h3>
+                        <p>100 खिलाड़ी प्रति Match<br></p>
+                        <br>
+                  
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fas fa-trophy fa-3x mb-3"></i>
+                        <h3>पुरस्कार</h3>
+                        <p>विजेता: ₹20,000<br>रनर-अप: ₹10,000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prize Pool -->
+    <section class="prize-pool py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">प्राइज पूल</h2>
+            <div class="prize-grid">
+                <div class="prize-card winner">
+                    <div class="prize-amount">₹50</div>
+                    <div class="prize-label">प्रति किल</div>
+                </div>
+                <div class="prize-card first">
+                    <div class="prize-amount">₹20,000</div>
+                    <div class="prize-label">विजेता टीम</div>
+                </div>
+                <div class="prize-card second">
+                    <div class="prize-amount">₹10,000</div>
+                    <div class="prize-label">रनर-अप टीम</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules -->
+    <section class="rules py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">नियम और शर्तें</h2>
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h4>1. पंजीकरण</h4>
+                    <p>टीम रजिस्ट्रेशन अनिवार्य है</p>
+                </div>
+                <div class="rule-card">
+                    <h4>2. टीम संरचना</h4>
+                    <p>100 खिलाड़ी</p>
+                    
+                </div>
+                <div class="rule-card">
+                    <h4>3. मैच फॉर्मेट</h4>
+                    <p>1 राउंड (एरंगल, मिरामार, सनहोक)</p>
+                </div>
+                <div class="rule-card">
+                    <h4>4. स्कोरिंग</h4>
+                    <p>अगर Join fee ₹100 है<br> तो प्रति किल: ₹50<br>विजयी खिलाड़ी: प्रति किल: ₹100</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration CTA -->
+    <section class="registration-cta py-5">
+        <div class="container text-center">
+          <h2 class="section-title mb-4">अभी रजिस्टर करें</h2>
+            <p class="lead mb-4">सीमित स्लॉट उपलब्ध | जल्दी करें</p>
+           
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <footer class="footer py-4">
+        <div class="container text-center">
+           
+            <p>ईमेल: help@joinbattle.online</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

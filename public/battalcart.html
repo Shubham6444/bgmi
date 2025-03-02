@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Chart</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f38545;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+          
+            max-width: 1000px;
+            padding: 20px;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        h2 {
+            color: #ff9800;
+        }
+
+        /* Loader Styles */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
+
+        .loader {
+            border: 3px solid #00ff00;
+            border-top: 3px solid #f8a306;
+            border-bottom: 3px solid #fd0505;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.5s linear infinite;
+            margin: 5px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Table-like Layout */
+        .battle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .battle-table th, .battle-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #fff;
+        }
+
+        .battle-table th {
+            background-color: #333;
+            color: #ff9800;
+        }
+
+        .battle-table td {
+            background-color: #2a2a2a;
+            color: #ffffff;
+        }
+
+        /* Search Bar Styles */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px;
+            font-size: 14px;
+            width: 300px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ff9800;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ff5c00;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 2px solid white;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .battle-table th, .battle-table td {
+                font-size: 12px;
+                padding: 8px;
+              
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .loader-container {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="bottom-nav">
+        <a href="/toornament.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <div>Home</div>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fab fa-fly"></i>
+            <div>Joined</div>
+        </a>
+        <a href="/wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <div>Wallet</div>
+        </a>
+        <a href="support.html" class="nav-item">
+            <i class="fab fa-weixin"></i>
+            <div>Support</div>
+        </a>
+    </nav>
+
+    <div class="container">
+        <h2>🔥 Battle Stats 🔥</h2>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by User ID or Battle ID..." oninput="searchBattleStats()">
+        </div>
+
+        <!-- Loader -->
+        <div class="loader-container" id="loader" style="display:none;">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Table for Battle Stats -->
+        <table class="battle-table" id="battleStatsTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>User ID</th>
+                    <th>Battle ID</th>
+                    <th>Total Kills</th>
+                    <th>Won Amount</th>
+                </tr>
+            </thead>
+            <tbody id="battleCards">
+                <!-- Battle stats will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+       
+           // Existing JavaScript code
+           async function verifySession() {
+            try {
+                const response = await fetch('/session', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    const result = await response.json();
+                   // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('picture').src = result.user.picture;
+                  // console.log(result)
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+               return;
+                window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        // Main function to fetch and display battle stats
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get("battleId");
+
+            if (!battleId) {
+                alert("No Battle ID provided!");
+                return;
+            }
+
+            const loader = document.getElementById("loader");
+            const cardsContainer = document.getElementById("battleCards");
+
+            async function fetchBattleStats() {
+                try {
+                    loader.style.display = "flex"; // Show loader
+                    cardsContainer.innerHTML = ""; // Clear previous data
+
+                    const response = await fetch(`/auth/joined?battleId=${battleId}`);
+                    const battleStats = await response.json();
+                    if (!response.ok) {
+                        throw new Error(battleStats.error || "Failed to fetch data");
+                    }
+
+                    displayBattleStats(battleStats);
+                } catch (error) {
+                    console.error("Error fetching battle stats:", error);
+                    cardsContainer.innerHTML = `<tr><td colspan="5">Error loading data. Please try again later.</td></tr>`;
+                } finally {
+                    loader.style.display = "none"; // Hide loader
+                }
+            }
+
+            function maskEmail(email) {
+                // Masking email (only showing first 3 characters and last 2)
+                const [username, domain] = email.split('@');
+                const maskedUsername = username.slice(0, 5) + '*'.repeat(username.length - 5) + username.slice(-2);
+                return `${maskedUsername}@${domain}`;
+            }
+
+            function displayBattleStats(battleStats) {
+                if (battleStats.length === 0) {
+                    cardsContainer.innerHTML = `<tr><td colspan="5">🚀 No battle stats found! 🚀</td></tr>`;
+                    return;
+                }
+
+                battleStats.forEach((stat, index) => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${maskEmail(stat.user_id)}</td> <!-- Masked Email -->
+                        <td>${stat.battle_id}</td>
+                        <td>${stat.total_kills || 0}</td>
+                        <td>₹${stat.won_amount || 0}</td>
+                    `;
+
+                    cardsContainer.appendChild(row);
+                });
+            }
+
+            // Search function
+            window.searchBattleStats = function() {
+                const searchInput = document.getElementById("searchInput").value.toLowerCase();
+                const rows = document.querySelectorAll("#battleCards tr");
+
+                rows.forEach(row => {
+                    const userId = row.cells[1].textContent.toLowerCase();
+                    const battleId = row.cells[2].textContent.toLowerCase();
+                    if (userId.includes(searchInput) || battleId.includes(searchInput)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            fetchBattleStats();
+        });
+    </script>
+</body>
+</html>

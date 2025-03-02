@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 72px;
+      color: #f44336;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #666666;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .icon {
+      font-size: 100px;
+      color: #f44336;
+      margin-bottom: 20px;
+    }
+
+    /* Add a subtle animation to the 404 icon */
+    .icon-animate {
+      animation: shake 0.6s ease-in-out infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="icon icon-animate">&#128565;</div> <!-- 404 emoji -->
+    <h1>404</h1>
+    <p>Oops! The page you're looking for doesn't exist.</p>
+    <a href="/" class="btn" onclick="goHome()">Go Back to Home</a>
+  </div>
+
+  <script>
+    function goHome() {
+      window.location.href = '/'; // Redirects to the home page
+    }
+  </script>
+
+</body>
+</html>

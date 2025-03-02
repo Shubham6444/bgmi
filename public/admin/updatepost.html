@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+           
+            
+            
+            height: 100vh;
+            display: flex;
+        }
+
+        .container {
+            width: 50%;
+            padding: 20px;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+           
+        }
+
+        input {
+            width: 97%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #ff5722, #ff9800);
+        }
+
+        .response-message {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .tournament-list {
+            margin-top: 20px;
+            text-align: left;
+            width: 30%;
+            margin: 10px;
+        }
+
+        .tournament-item {
+            padding: 10px;
+            background-color: #222;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+  
+        
+        <div id="tournamentList" class="tournament-list"></div>
+        <div class="container">
+        <form id="tournamentForm">
+            <input type="text" id="battleId" name="battleId" placeholder="Battle ID" required>
+            <input type="text" id="heading" name="heading" placeholder="Tournament Heading" required>
+            <input type="datetime-local" id="time" name="time" placeholder="Tournament Time" required>
+            <input type="number" id="currentParticipants" name="currentParticipants" placeholder="Current Participants" required>
+            <input type="number" id="joinFee" name="joinFee" placeholder="Join Fee" required>
+            <input type="text" id="roomId" name="roomId" placeholder="Room ID" required>
+            <input type="password" id="password" name="password" placeholder="Password" >
+            <button type="submit">Update Tournament</button>
+        </form><br>
+        <button onclick="deleteTournament()">Delete Tournament</button>
+        <div id="responseMessage" class="response-message"></div>
+    </div>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                    fetchTournaments();
+
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });</script>
+
+
+
+
+    <script>
+        async function fetchTournaments() {
+            try {
+                const response = await fetch("/auth/tournaments");
+                const tournaments = await response.json();
+                const tournamentList = document.getElementById("tournamentList");
+                tournamentList.innerHTML = "";
+                tournaments.forEach(tournament => {
+                    const div = document.createElement("div");
+                    div.className = "tournament-item";
+                    div.innerHTML = `<strong>${tournament.heading}</strong> - ${tournament.time} => Battle ID : ${tournament.battleId} 
+                        <button onclick='populateForm(${JSON.stringify(tournament)})'>Edit</button>`;
+                    tournamentList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error fetching tournaments:", error);
+            }
+        }
+        
+
+        function populateForm(tournament) {
+            document.getElementById("battleId").value = tournament.battleId;
+            document.getElementById("heading").value = tournament.heading;
+            document.getElementById("time").value = tournament.time;
+            document.getElementById("currentParticipants").value = tournament.currentParticipants;
+            document.getElementById("joinFee").value = tournament.joinfee;
+            document.getElementById("roomId").value = tournament.roomid;
+            document.getElementById("password").value = tournament.password;
+        }
+
+        document.getElementById("tournamentForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const response = await fetch("/auth/update_tournament", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                document.getElementById("responseMessage").innerText = result.message;
+                fetchTournaments();
+                alert(result.message)
+            } catch (error) {
+                document.getElementById("responseMessage").innerText = "Error updating tournament!";
+                alert('Error updating tournament!')
+            }
+        });
+
+        async function deleteTournament() {
+            const battleId = document.getElementById("battleId").value;
+            if (!battleId) {
+                alert("Please enter Battle ID to delete");
+                return;
+            }
+            try {
+                const response = await fetch("/auth/delete_tournament", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ battleId }),
+                });
+                const result = await response.json();
+                alert(result.message);
+                fetchTournaments();
+            } catch (error) {
+                alert("Error deleting tournament!");
+            }
+        }
+
+      
+    </script>
+</body>
+</html>

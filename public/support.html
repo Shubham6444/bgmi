@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f08e1f;
+            color: #333;
+            z-index: -1;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: #ff7f00;
+            color: white;
+            padding: 15px 0;
+        }
+
+        header h1 {
+            text-align: center;
+        }
+
+        header nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        header nav a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+        }
+
+        header nav a:hover {
+            text-decoration: underline;
+        }
+
+        .main-content {
+            padding: 30px 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #ff7f00;
+            margin-bottom: 30px;
+        }
+
+        .help-options {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .help-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .help-form input,
+        .help-form textarea {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .help-form button {
+            background-color: #ff8800;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            box-shadow: 2px 2px 3px 2px;
+        }
+
+        .help-form button:hover {
+            background-color: #ff5c00;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .help-options {
+                text-align: center;
+            }
+
+            select {
+                width: 100%;
+            }
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ff5c00;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 2px solid white;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        #queryContainer {
+    margin: 10px;
+    border-radius: 8px;
+    word-wrap: break-word; /* Ensures text wraps within the container */
+    white-space: normal;   /* Ensures multiple lines of text wrap correctly */
+}
+
+
+
+
+        #queryContainer .query {
+            border-radius: 8px;
+
+            margin-top: 5px;
+            padding: 10px;
+            color: #ffffff;
+
+        }
+
+
+
+
+        .loader {
+            border: 3px solid #00ff00;
+            border-top: 3px solid #f8a306;
+            border-bottom: 3px solid #fd0505;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 0.5s linear infinite;
+            margin: 5px auto;
+            color: #534f4f;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <nav class="bottom-nav">
+        <a href="toornament.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <div>Home</div>
+        </a>
+
+        <a href="mybttles.html" class="nav-item">
+            <i class="fab fa-fly"></i>
+            <div>Joined</div>
+        </a>
+        <a href="/wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <div>Wallet</div>
+        </a>
+        <a style="color: rgb(0, 0, 0);" href="support.html" class="nav-item">
+            <i class="fab fa-weixin"></i>
+            <div>support</div>
+        </a>
+    </nav>
+    <header>
+        <div class="container">
+            <h1>Help Center</h1>
+          
+    </header>
+
+    <section class="main-content">
+        <div class="container">
+            <h2 style="color: black;">How Can We Help You?</h2>
+            <div class="help-options">
+                <select id="helpSelect" onchange="showSectionFromDropdown()">
+                    <option value="">Select an issue</option>
+                    <option value="addMoney">Add Money</option>
+                    <option value="withdraw">Withdraw</option>
+                    <option value="join">Join</option>
+                    <option value="upiIssues">UPI Issues</option>
+                    <option value="bgmiIdIssues">BGMI ID Issues</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <!-- Add Money Section -->
+            <div class="section" id="addMoney">
+                <h3>Add Money</h3>
+                <p>If you are facing issues while adding money, please make sure your payment method is correct...</p>
+                <div class="help-form">
+                    <input type="text" id="orderId_addMoney" placeholder="Enter Order ID" />
+                    <textarea id="query_addMoney" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('addMoney')">Submit</button>
+                </div>
+            </div>
+
+            <!-- Withdraw Section -->
+            <div class="section" id="withdraw">
+                <h3>Withdraw</h3>
+                <p>To withdraw your balance, ensure your account information is verified...</p>
+                <div class="help-form">
+                    <input type="text" id="orderId_withdraw" placeholder="Enter Order ID" />
+                    <textarea id="query_withdraw" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('withdraw')">Submit</button>
+                </div>
+            </div>
+
+            <!-- Join Section -->
+            <div class="section" id="join">
+                <h3>Join</h3>
+                <p>To join, follow these steps: 1. Register your account...</p>
+                <div class="help-form">
+                    <input type="text" id="orderId_join" placeholder="Enter Order ID" />
+                    <textarea id="query_join" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('join')">Submit</button>
+                </div>
+            </div>
+
+            <!-- UPI Issues Section -->
+            <div class="section" id="upiIssues">
+                <h3>UPI Issues</h3>
+                <p>If you are having problems with UPI payments, check that your UPI ID is active and linked...</p>
+                <div class="help-form">
+                    <input type="text" id="orderId_upiIssues" placeholder="Enter Order ID" />
+                    <textarea id="query_upiIssues" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('upiIssues')">Submit</button>
+                </div>
+            </div>
+
+            <!-- BGMI ID Issues Section -->
+            <div class="section" id="bgmiIdIssues">
+                <h3>BGMI ID Issues</h3>
+                <p>If you face BGMI ID issues, ensure your account is linked to the correct game ID...</p>
+                <div class="help-form">
+                    <input type="text" id="orderId_bgmiIdIssues" placeholder="Enter Order ID" />
+                    <textarea id="query_bgmiIdIssues" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('bgmiIdIssues')">Submit</button>
+                </div>
+            </div>
+
+            <!-- Other Section -->
+            <div class="section" id="other">
+                <h3>Other</h3>
+                <p>If you are facing other issues, enter your Order ID and describe the issue...</p>
+                <div class="help-form">
+                    <input type="text" value="12345678" id="orderId_other" placeholder="Enter Order ID 12345678"
+                        hidden />
+                    <textarea id="query_other" placeholder="Describe your issue..."></textarea>
+                    <button class="help-btn" onclick="submitForm('other')">Submit</button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="helpbox">
+            <div id="queryContainer">
+                <div id="loader" class="loader"></div>
+
+            </div>
+        </div>
+
+
+
+    </section>
+    <br><br><br>
+    <script>
+        // Function to display the selected section based on dropdown selection
+        function showSectionFromDropdown() {
+            const selectedOption = document.getElementById('helpSelect').value;
+
+            // Hide all sections initially
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+
+            // Show the selected section
+            if (selectedOption) {
+                const activeSection = document.getElementById(selectedOption);
+                activeSection.style.display = 'block';
+            }
+        }
+
+        // Function to submit the form
+async function submitForm(section) {
+    const orderIdElement = document.getElementById('orderId_' + section);  // Get the Order ID input element
+    const queryElement = document.getElementById('query_' + section);      // Get the Query input element
+    const orderId = orderIdElement.value;
+    const query = queryElement.value;
+    const time = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const type = section;  // Use the section name as the query type
+
+    // Validate Order ID (min 8 characters) and Query (min 10 characters)
+    if (!orderId || orderId.length < 8) {
+        alert('Order ID must be at least 8 characters long.');
+        return;
+    }
+
+    if (!query || query.length < 10) {
+        alert('Query must be at least 10 characters long.');
+        return;
+    }
+
+    try {
+        // Send data to the backend API
+        const response = await fetch('/auth/help', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderid: orderId, type, query, time }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Show success message
+            alert(data.message);
+            helpquery();  // Call any additional function (if needed)
+            
+            // Clear form fields
+            orderIdElement.value = '';
+            queryElement.value = '';
+        } else {
+            // Show error message
+            alert(data.message || 'There was an error while submitting your query.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('There was an error while processing your request. Please try again later.');
+    }
+}
+        // Fetch and display query data
+        async function helpquery() {
+                document.getElementById('loader').style.display='block';
+
+            try {
+                const response = await fetch('/auth/helpinfo');
+
+                // Check if the response was successful
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }  document.getElementById('loader').style.display='none';
+
+                const data = await response.json();  // This gives you the full response object
+
+                // Extract the query array from the response object
+                const battleStats = data.query;  // Access the "query" array inside the response
+
+                const queryContainer = document.getElementById('queryContainer');
+                // Clear the loading text if the data is fetched
+                queryContainer.innerHTML = '';
+
+                // Ensure that battleStats is an array
+                if (!Array.isArray(battleStats)) {
+                    queryContainer.innerHTML = '<p>Invalid data format received.</p>';
+                    console.error('Expected an array, but got:', battleStats);
+                    return;
+                }
+
+                // Check if there are any battle stats to display
+                if (battleStats.length === 0) {
+                    queryContainer.innerHTML = '<center>No query available.</center>';
+                    return;
+                }
+
+                battleStats.reverse().forEach((stat, index) => {
+                    const card = document.createElement("div");
+
+                    // Conditional styling based on the status
+                    const statusClass = stat.status === "Pending" ? "red" : "green"; // Choose red for Pending, green for other status
+
+                    card.classList.add("battle-card");
+
+                    card.innerHTML = `
+        <div class="query" style="background:${statusClass};">
+            <div>
+                <h3>S.No #${battleStats.length - index}</h3> <!-- Proper serial number in reverse order -->
+                <p><strong>Orderid :</strong> ${stat.orderid}</p>
+            </div>
+            <div>
+                <p><strong>Type : </strong> ${stat.type || 0}</p>
+                <p class="amount"><strong>Query : </strong> ${stat.query || 0}</p>
+                <p class="amount"><strong>Time : </strong> ${stat.time || 0}</p>
+                <p class="amount"><strong>Status : </strong> ${stat.status || "Pending"}</p>
+                                <p class="amount"><strong>Message : </strong> ${stat.message || 0}</p>
+
+            </div>
+        </div>
+    `;
+
+                    queryContainer.appendChild(card);
+                });
+              
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('queryContainer').innerHTML = '<p>Failed to load queries.</p>';
+            }
+        }
+
+        // Call the query function on page load
+        window.onload = helpquery;
+
+
+
+
+
+           // Existing JavaScript code
+           async function verifySession() {
+            try {
+                const response = await fetch('/session', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    const result = await response.json();
+                   // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('picture').src = result.user.picture;
+                  // console.log(result)
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+               return;
+                window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+
+
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

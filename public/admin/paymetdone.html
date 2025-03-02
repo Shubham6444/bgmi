@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet History</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Container */
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Title Styles */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-bar {
+            padding: 8px 16px;
+            width: 60%;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Button Styles */
+        .update-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Mobile Responsiveness */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            .search-bar {
+                width: 80%;
+            }
+
+            table th, table td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Wallet History</h1>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" class="search-bar" id="searchBar" placeholder="Search by email, order ID, pay ID..." onkeyup="searchTable()">
+        </div>
+
+        <!-- Loader -->
+        <div class="loader" id="loader"></div>
+
+        <table id="walletTable">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Order ID</th>
+                    <th>Pay ID</th>
+                    <th>Actions</th> <!-- New column for update button -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                  
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to fetch data from the server
+        function fetchData() {
+            document.getElementById('loader').style.display = 'block';  // Show loader
+            fetch('/auth/user-data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('loader').style.display = 'none'; // Hide loader
+                    populateWalletTable(data.walletHistory);  // Use the function to populate wallet history
+                })
+                .catch(error => {
+                    document.getElementById('loader').style.display = 'none'; // Hide loader
+                    console.error('There was a problem with the fetch operation:', error);
+                    alert('There was an error fetching the data');
+                });
+        }
+
+        // Function to populate the wallet table
+        function populateWalletTable(walletHistory) {
+            const tableBody = document.querySelector("#walletTable tbody");
+
+            // Clear any existing rows in the table body
+            tableBody.innerHTML = "";
+
+            // Loop through each wallet entry and add it to the table
+            walletHistory.reverse().forEach(entry => {
+                const row = document.createElement("tr");
+
+                const emailCell = document.createElement("td");
+                emailCell.textContent = entry.email;
+                row.appendChild(emailCell);
+
+                const amountCell = document.createElement("td");
+                amountCell.textContent = entry.amount;
+                row.appendChild(amountCell);
+
+                const methodCell = document.createElement("td");
+                methodCell.textContent = entry.method;
+                row.appendChild(methodCell);
+
+                const timeCell = document.createElement("td");
+                timeCell.textContent = entry.time;
+                row.appendChild(timeCell);
+
+                const statusCell = document.createElement("td");
+                statusCell.textContent = entry.status;
+                row.appendChild(statusCell);
+
+                const orderIdCell = document.createElement("td");
+                orderIdCell.textContent = entry.order_id;
+                row.appendChild(orderIdCell);
+
+                const payIdCell = document.createElement("td");
+                payIdCell.textContent = entry.payid;
+                row.appendChild(payIdCell);
+
+                // Create Update Status button
+                const actionCell = document.createElement("td");
+                const updateBtn = document.createElement("button");
+                updateBtn.className = "update-btn";
+                updateBtn.textContent = "Update Status";
+                updateBtn.onclick = () => updateStatus(entry.order_id, entry.payid, statusCell);
+                actionCell.appendChild(updateBtn);
+                row.appendChild(actionCell);
+
+                // Append the row to the table body
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update the status to 'completed'
+        function updateStatus(orderId, payId, statusCell) {
+            // Send request to the server to mark payment as done
+            fetch('/auth/completeHistory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    payid: payId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update status');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update the status cell in the table
+                statusCell.textContent = 'Completed'; // Update the status to 'Completed'
+                alert('Payment status updated successfully!');
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+                alert('There was a problem updating the payment status');
+            });
+        }
+
+        // Function to filter the table based on search input
+        function searchTable() {
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const rows = document.querySelectorAll('#walletTable tbody tr');
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                // Loop through each cell in the row
+                for (let i = 0; i < cells.length; i++) {
+                    const cellValue = cells[i].textContent.toLowerCase();
+                    if (cellValue.includes(searchTerm)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Call fetchData when the page is loaded
+        window.onload = fetchData;
+    </script>
+</body>
+</html>

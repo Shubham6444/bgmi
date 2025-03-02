@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BGMI Tournament Admin Panel</title>
+   
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                  
+    fetchData();
+    setupFilters(); // Initialize filtering for all tables
+
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });</script>
+    <style>
+      * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light gray text */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+section {
+    background-color: #1e1e1e; /* Dark gray cards */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+th {
+    background-color: #292929; /* Darker header */
+    font-weight: bold;
+    color: #f0f0f0;
+}
+
+tr:nth-child(even) {
+    background-color: #252525;
+}
+
+tr:hover {
+    background-color: #333; /* Highlight row on hover */
+}
+
+.filter {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter label {
+    margin-right: 10px;
+}
+
+.filter select, .filter input {
+    padding: 8px;
+    background-color: #222;
+    border: 1px solid #444;
+    color: #e0e0e0;
+    border-radius: 4px;
+}
+
+.filter select:focus, .filter input:focus {
+    outline: none;
+    border-color: #f39c12; /* Highlight color */
+}
+
+/* Button Styles */
+button {
+    background-color: #f39c12; /* Orange accent */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #e67e22;
+}
+
+@media screen and (max-width: 768px) {
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    .filter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter select, .filter input {
+        margin-bottom: 10px;
+    }
+    section {
+    
+    width: 100vh;
+}
+
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BGMI Tournament Admin Panel</h1>
+        
+        <section id="user-list">
+            <h2>All Users</h2>
+            <div class="filter">
+                <label for="user-filter">Filter:</label>
+                <select id="user-filter">
+                    <option value="all">All</option>
+                    <option value="name">Name</option>
+                    <option value="email">Email</option>
+                    <option value="upi">UPI ID</option>
+                </select>
+                <input type="text" id="user-search" placeholder="Search...">
+            </div>
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>password</th>
+                        <th>UPI ID</th>
+                        <th>Added Money</th>
+                        <th>Win Money</th>
+                        <th>BGMI ID</th>
+                        <th>FreeFire ID</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="wallet-history">
+            <h2>Wallet History</h2>
+            <table id="wallet-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Order ID</th>
+                        <th>Pay ID</th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="all-battles">
+            <h2>Running battle</h2>
+            <table id="battles-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Battle ID</th>
+                        <th>Total Kill</th>
+                        <th>Won Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section id="battle-details">
+            <h2>Posted Battle Details</h2>
+            <table id="battle-details-table">
+                <thead>
+                    <tr>
+                        <th>Battle ID</th>
+                        <th>Title</th>
+                        <th>Time</th>
+                        <th>Current Participants</th>
+                        <th>Join Fee</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+    
+
+
+
+function setupFilters() {
+    document.querySelectorAll(".filter input, .filter select").forEach((filterElement) => {
+        filterElement.addEventListener("input", applyFilters);
+        filterElement.addEventListener("change", applyFilters);
+    });
+}
+
+function applyFilters() {
+    const userFilterType = document.querySelector("#user-filter").value;
+    const userSearchTerm = document.querySelector("#user-search").value.toLowerCase();
+
+    fetch("/auth/user-data")
+        .then((response) => response.json())
+        .then((data) => {
+            // Apply filtering for each table
+            filterAndRenderUsers(data.users, userFilterType, userSearchTerm);
+            filterAndRenderWallet(data.walletHistory, userSearchTerm);
+            filterAndRenderBattles(data.battles, userSearchTerm);
+            filterAndRenderBattleStats(data.battle_stats, userSearchTerm);
+        })
+        .catch((error) => console.error("Error fetching data:", error));
+}
+
+function filterAndRenderUsers(users, filterType, searchTerm) {
+    let filteredUsers = users.filter((user) => {
+        if (!searchTerm) return true;
+        if (filterType === "name") return user.name.toLowerCase().includes(searchTerm);
+        if (filterType === "email") return user.email.toLowerCase().includes(searchTerm);
+        if (filterType === "upi") return user.upiid.toLowerCase().includes(searchTerm);
+        return true;
+    });
+    populateUsersTable(filteredUsers);
+}
+
+function filterAndRenderWallet(walletHistory, searchTerm) {
+    let filteredWallet = walletHistory.filter((entry) => {
+        return Object.values(entry).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm)
+        );
+    });
+    populateWalletTable(filteredWallet);
+}
+
+function filterAndRenderBattles(battles, searchTerm) {
+    let filteredBattles = battles.filter((battle) => {
+        return Object.values(battle).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm)
+        );
+    });
+    populateBattlesTable(filteredBattles);
+}
+
+function filterAndRenderBattleStats(battleStats, searchTerm) {
+    let filteredBattleStats = battleStats.filter((battle) => {
+        return Object.values(battle).some((value) =>
+            value.toString().toLowerCase().includes(searchTerm)
+        );
+    });
+    populatecrrentbattleTable(filteredBattleStats);
+}
+
+
+        function fetchData() {
+            fetch('/auth/user-data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateUsersTable(data.users);
+                    populateWalletTable(data.walletHistory);
+                    populateBattlesTable(data.battles);
+                    populatecrrentbattleTable(data.battle_stats);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function populateUsersTable(users) {
+    const tbody = document.querySelector("#users-table tbody");
+    tbody.innerHTML = ""; 
+    
+    let total_addamount = 0;
+    let total_winamount = 0;
+
+    users.forEach(user => {
+        total_addamount += Number(user.addamount) || 0; // Ensure numeric sum
+        total_winamount += Number(user.winamount) || 0; // Ensure numeric sum
+        
+        const row = `<tr>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.password.slice(0,4)}</td>
+            <td>${user.upiid}</td>
+            <td>₹${user.addamount}</td>
+            <td>₹${user.winamount}</td>
+            <td>${user.bgmi_id}</td>
+            <td>${user.freefir_id}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+
+    // Append total row
+    const totalRow = `<tr style="font-weight: bold; background-color: black;">
+        <td colspan="3">Total Added Amount:</td>
+        <td>₹${total_addamount}</td>
+        <td>₹${total_winamount}</td>
+        <td colspan="1"></td>
+    </tr>`;
+
+    tbody.innerHTML += totalRow;
+}
+
+        function populateWalletTable(walletHistory) {
+            const tbody = document.querySelector("#wallet-table tbody");
+            tbody.innerHTML = ""; 
+            walletHistory.forEach(entry => {
+                const row = `<tr>
+                    <td>${entry.email || 'N/A'}</td>
+                    <td>${entry.amount}</td>
+                    <td>${entry.method}</td>
+                    <td>${entry.time}</td>
+                    <td>${entry.status}</td>
+                    <td>${entry.order_id}</td>
+                    <td>${entry.payid || 'no need'}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function populateBattlesTable(battles) {
+            const tbody = document.querySelector("#battle-details-table tbody");
+            tbody.innerHTML = ""; 
+            battles.forEach(battle => {
+                const row = `<tr>
+                    <td>${battle.battleId}</td>
+                    <td>${battle.heading}</td>
+                    <td>${battle.time}</td>
+                    <td>${battle.currentParticipants}</td>
+                    <td>${battle.joinfee}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+
+
+
+
+
+        function populatecrrentbattleTable(crrentbattle) {
+            const tbody = document.querySelector("#battles-table tbody");
+            tbody.innerHTML = ""; 
+            crrentbattle.forEach(battle => {
+                const row = `<tr>
+                    <td>${battle.user_id}</td>
+                    <td>${battle.battle_id}</td>
+                    <td>${battle.total_kills}</td>
+                    <td>${battle.won_amount}</td>
+                    
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+    
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

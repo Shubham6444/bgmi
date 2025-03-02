@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        *{margin: 0;padding: 0;}
+        body {
+        display: flex;
+        font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+        width: 200px;
+        background: #333;
+        padding: 15px;
+        height: 100vh;
+        }
+
+        .menu-btn {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        background: #444;
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-align: start;
+        }
+
+        .menu-btn:hover {
+        background: #555;
+        }
+
+        #content {
+        flex-grow: 1;
+        padding: 20px;
+        }
+        a{color: orange;text-decoration: none;}
+        .battle-card {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .battle-card .query {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .red { background: #ffcccc; }
+        .green { background: #ccffcc; }
+        .button-update {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .button-update:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <button class="menu-btn"><a href="addb.html">Post battle</a></button> 
+        <button class="menu-btn"><a href="updateuser.html">Update profile</a></button>         
+        <button class="menu-btn"><a href="userdata.html">User data</a></button>
+        <button class="menu-btn"><a href="updatekill.html">Update kill price</a></button>
+        <button class="menu-btn"><a href="updatepost.html">Update post</a></button> 
+        <button class="menu-btn"><a href="paymetdone.html">withdraw request</a></button> 
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="content">
+        <p><strong>Message : </strong><input id='msg' type='text'></p>
+        <div class="helpbox">
+            <div id="queryContainer">
+                <div id="loader" class="loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                  
+    fetchData();
+    setupFilters(); // Initialize filtering for all tables
+
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });
+
+
+
+
+
+
+
+        // Fetch and display query data
+        async function helpquery() {
+            try {
+                const response = await fetch('/auth/helpinfoadmin');
+                
+                // Check if the response was successful
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+        
+                const data = await response.json();  // This gives you the full response object
+                console.log(data);  // Log to inspect the structure of the data
+        
+                const battleStats = data.query;  // Access the "query" array inside the response
+        
+                const queryContainer = document.getElementById('queryContainer');
+               
+                queryContainer.innerHTML = '';  // Clear loader text
+                
+                // Ensure battleStats is an array
+                if (!Array.isArray(battleStats)) {
+                    queryContainer.innerHTML = '<p>Invalid data format received.</p>';
+                    console.error('Expected an array, but got:', battleStats);
+                    return;
+                }
+        
+                if (battleStats.length === 0) {
+                    queryContainer.innerHTML = '<p>No battle data available.</p>';
+                    return;
+                }
+        
+                battleStats.reverse().forEach((stat, index) => {
+                    const card = document.createElement("div");
+                    const statusClass = stat.status === "Pending" ? "red" : "green";  // Choose color based on status
+        
+                    card.classList.add("battle-card");
+        
+                    card.innerHTML = `
+                        <div class="query" style="background:${statusClass};">
+                            <div>
+                                <h3>S.No #${battleStats.length - index}</h3> <!-- Proper serial number in reverse order -->
+                                <p><strong>Orderid :</strong> ${stat.orderid}</p>
+                                <p><strong>UserName :</strong> ${stat.email}</p>
+                             
+                            </div>
+                            <div>
+                                <p><strong>Type : </strong> ${stat.type || 0}</p>
+                                <p class="amount"><strong>Query : </strong> ${stat.query || 0}</p>
+                                <p class="amount"><strong>Time : </strong> ${stat.time || 0}</p>
+                                <p class="amount"><strong>Status : </strong> ${stat.status || "Pending"}</p>
+                                <button class="button-update" onclick="updateStatus('${stat.email}','${stat.orderid}', '${stat.status === 'Pending' ? 'Resolved' : 'Pending'}','${stat.time}')">
+                                    Mark as ${stat.status === 'Pending' ? 'Resolved' : 'Pending'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+        
+                    queryContainer.appendChild(card);
+                });
+        
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('queryContainer').innerHTML = '<p>Failed to load queries.</p>';
+            }
+        }
+        
+        // Call the query function on page load
+        window.onload = helpquery;
+
+        // Function to update the status
+        async function updateStatus(email,orderid, newStatus,time) {
+            let Message = document.getElementById('msg').value;
+            try {
+                const response = await fetch('/auth/helpupdate', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({email, orderid,time, status: newStatus ,Message})
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update status');
+                }
+
+                const result = await response.json();
+                alert(result.message);  // Show a message upon success
+
+                // Refresh the page to get the latest data
+                helpquery();
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Error updating status. Please try again later.');
+            }
+        }
+    </script>
+</body>
+</html>

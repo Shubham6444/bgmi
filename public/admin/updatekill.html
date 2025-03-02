@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          
+            height: 100vh;
+        }
+
+        .container {
+         
+            
+            padding: 20px;
+            background-color: #504d4d;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Filter styling */
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .filters input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            background-color: #333;
+            color: #00ff2a;
+            width: 45%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 8px 12px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #ff5722, #ff9800);
+        }
+
+        
+/* Mobile responsiveness using media queries */
+@media (max-width: 768px) {
+ 
+}
+
+@media (max-width: 480px) {
+    body{
+        width: 150vh;
+    }
+    .container {
+         
+         width: 100%;
+      
+     }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Tournaments</h1>
+
+        <!-- Filters Section -->
+        <div class="filters">
+            <input type="text" id="filterUserId" placeholder="Filter by User ID" oninput="filterData()">
+            <input type="text" id="filterBattleId" placeholder="Filter by Battle ID" oninput="filterData()">
+        </div>
+
+        <!-- Tournament Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                   
+                    <th>Battle ID</th>
+                    <th>GameID</th>
+                    <th>Total Kill</th>
+                    <th>Won Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tournamentTable">
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+
+
+document.addEventListener("DOMContentLoaded", () => {
+        // Existing JavaScript code
+        async function verifySession() {
+            try {
+                const response = await fetch('/adminsession', {
+                    method: 'GET',
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                   console.log(await response.json())
+                   return;
+                } else {
+                    const result = await response.json();
+                    console.log(result)
+                    fetchTournaments();
+                    // document.getElementById('userInfo').textContent = `Welcome ${result.user.name}`;
+                    //document.getElementById('profilepic').src = result.user.picture || 'images/game-img-3.png';
+                 
+                   
+                }
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return;
+               window.location.href = '/login.html';
+            }
+        }
+
+        verifySession();
+        
+    });
+
+
+
+
+
+
+
+
+
+        let allTournaments = []; // Store all tournaments data
+
+        // Function to fetch and display tournaments
+        async function fetchTournaments() {
+            try {
+                const response = await fetch("/auth/joinedall");
+                const tournaments = await response.json();
+                allTournaments = tournaments; // Store fetched data
+                displayTournaments(tournaments); // Display the tournaments
+            } catch (error) {
+                console.error("Error fetching tournaments:", error);
+            }
+        }
+
+        // Function to filter and display tournaments based on user input
+        function filterData() {
+            const userIdFilter = document.getElementById("filterUserId").value.toLowerCase();
+            const battleIdFilter = document.getElementById("filterBattleId").value.toLowerCase();
+
+            // Filter tournaments based on the user ID and battle ID inputs
+            const filteredTournaments = allTournaments.filter(tournament => {
+                const matchesUserId = tournament.user_id.toLowerCase().includes(userIdFilter);
+                const matchesBattleId = tournament.battle_id.toLowerCase().includes(battleIdFilter);
+                return matchesUserId && matchesBattleId;
+            });
+
+            displayTournaments(filteredTournaments); // Display the filtered tournaments
+        }
+
+        // Function to display the tournaments in the table
+        function displayTournaments(tournaments) {
+            const tableBody = document.getElementById("tournamentTable");
+            tableBody.innerHTML = ""; // Clear previous table data
+
+            tournaments.forEach(tournament => {
+                const row = document.createElement("tr");
+              
+             
+                row.innerHTML = `
+                    <td><input style="color:white; background:green;" type="text" value="${tournament.user_id}" disabled></td>
+                    <td><input style="color:white; background:green;" type="text" value="${tournament.battle_id}" disabled></td>                   
+                    <td><input type="text" value="${tournament.gameid}"disabled></td>
+                   
+
+
+
+                     <td><input type="number" id="kill_${tournament.battle_id}" value="${tournament.total_kills}"></td>
+                    <td><input type="text" id="amount_${tournament.battle_id}" value="${tournament.won_amount}"></td>
+                    <td><button onclick="updateTournament('${tournament.user_id}','${tournament.battle_id}')">Update</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update tournament data
+        async function updateTournament(email,battleId) {
+            const totalKill = document.getElementById(`kill_${battleId}`).value;
+            const wonAmount = document.getElementById(`amount_${battleId}`).value;
+            try {
+                const response = await fetch("/auth/updateTournamentByEmail", {
+                    method: "put",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({email, battle_id: battleId, total_kill: totalKill, won_amount: wonAmount }),
+                });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                alert("Error updating tournament!");
+            }
+        }
+
+        // Fetch tournaments when the page loads
+      
+    </script>
+</body>
+</html>
